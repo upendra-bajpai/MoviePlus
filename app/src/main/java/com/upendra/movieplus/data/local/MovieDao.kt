@@ -24,4 +24,7 @@ interface MovieDao {
 
     @Query("DELETE FROM movies WHERE category = :category AND isBookmarked = 0")
     suspend fun clearCategory(category: String)
+
+    @Query("SELECT * FROM movies WHERE id = :movieId")
+    suspend fun getMovieById(movieId: Int): MovieEntity?
 }

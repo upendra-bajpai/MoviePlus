@@ -1,39 +1,60 @@
 package com.upendra.movieplus.ui.details
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.upendra.movieplus.data.repository.MovieRepository
 import com.upendra.movieplus.ui.model.Movie
 import com.upendra.movieplus.ui.model.MovieUiState
-import kotlinx.coroutines.delay
+import com.upendra.movieplus.utils.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import com.upendra.movieplus.data.repository.MovieRepository
 
 @HiltViewModel
 class MovieDetailsViewModel @Inject constructor(
-    private val repository: MovieRepository
+    private val repository: MovieRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _movieDetails = MutableStateFlow<MovieUiState<Movie>>(MovieUiState.Loading)
-    val movieDetails: StateFlow<MovieUiState<Movie>> = _movieDetails.asStateFlow()
+    private val movieId: Int = savedStateHandle.get<Int>("movieId") ?: -1
 
-    fun loadMovieDetails(movieId: Int) {
+    private val _uiState = MutableStateFlow<MovieUiState<Movie>>(MovieUiState.Loading)
+    val uiState: StateFlow<MovieUiState<Movie>> = _uiState.asStateFlow()
+
+    init {
+        fetchMovieDetails()
+    }
+
+    private fun fetchMovieDetails() {
+        if (movieId == -1) {
+            _uiState.value = MovieUiState.Error("Invalid Movie ID")
+            return
+        }
         viewModelScope.launch {
-            _movieDetails.value = MovieUiState.Loading
-            
-            // In a real app, you might fetch from repository here
-            // For now, using mock or getting from cached movies in repository
-            // repository.getMovieDetails(movieId) ... 
+            repository.getMovieDetails(movieId).collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        _uiState.value = MovieUiState.Loading
+                    }
+                    is Resource.Success -> {
+                        _uiState.value = MovieUiState.Success(resource.data)
+                    }
+                    is Resource.Error -> {
+                        _uiState.value = MovieUiState.Error(resource.message)
+                    }
+                }
+            }
         }
     }
 
     fun toggleBookmark(movie: Movie) {
         viewModelScope.launch {
             repository.toggleBookmark(movie.id, !movie.isBookmarked)
+                fetchMovieDetails()
         }
     }
 }

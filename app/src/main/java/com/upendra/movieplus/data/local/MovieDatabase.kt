@@ -1,12 +1,20 @@
 package com.upendra.movieplus.data.local
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.upendra.movieplus.data.local.entity.MovieEntity
 
-@Database(entities = [MovieEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [MovieEntity::class],
+    version = 2,
+    autoMigrations = [
+        AutoMigration(from = 1, to = 2)
+    ],
+    exportSchema = true
+)
 abstract class MovieDatabase : RoomDatabase() {
 
     abstract fun movieDao(): MovieDao

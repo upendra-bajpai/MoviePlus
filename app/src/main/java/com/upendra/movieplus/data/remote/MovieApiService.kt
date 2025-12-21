@@ -1,5 +1,6 @@
 package com.upendra.movieplus.data.remote
 
+import com.upendra.movieplus.data.remote.dto.MovieDetailsDto
 import com.upendra.movieplus.data.remote.dto.MovieDto
 import com.upendra.movieplus.data.remote.dto.MovieResponse
 import retrofit2.Response
@@ -33,7 +34,7 @@ interface MovieApiService {
     @GET("movie/{movie_id}")
     suspend fun getMovieDetails(
         @Path("movie_id") movieId: Int
-    ): Response<MovieDto>
+    ): Response<MovieDetailsDto>
 
     companion object {
         const val BASE_URL = "https://api.themoviedb.org/3/"

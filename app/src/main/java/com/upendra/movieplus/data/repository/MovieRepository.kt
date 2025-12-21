@@ -4,9 +4,12 @@ import android.util.Log
 import com.upendra.movieplus.data.local.MovieDao
 import com.upendra.movieplus.data.local.entity.MovieEntity
 import com.upendra.movieplus.data.remote.MovieApiService
+import com.upendra.movieplus.data.remote.dto.MovieDetailsDto
 import com.upendra.movieplus.data.remote.dto.MovieDto
+import com.upendra.movieplus.utils.Resource
 import com.upendra.movieplus.ui.model.Movie
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -102,6 +105,39 @@ class MovieRepository @Inject constructor(
         movieDao.updateBookmark(movieId, isBookmarked)
     }
 
+    fun getMovieDetails(movieId: Int): Flow<Resource<Movie>> = flow {
+        emit(Resource.Loading)
+
+        // Check local DB first
+        val cachedMovie = movieDao.getMovieById(movieId)
+        if (cachedMovie != null && cachedMovie.runtime != null) {
+            emit(Resource.Success(cachedMovie.toUiModel()))
+        }
+
+        // Fetch from network
+        try {
+            val response = apiService.getMovieDetails(movieId)
+            if (response.isSuccessful) {
+                response.body()?.let { dto ->
+                    val updatedEntity = dto.toEntity(
+                        category = cachedMovie?.category ?: "unknown",
+                        isBookmarked = cachedMovie?.isBookmarked ?: false
+                    )
+                    movieDao.upsertAll(listOf(updatedEntity))
+                    emit(Resource.Success(updatedEntity.toUiModel()))
+                }
+            } else {
+                emit(Resource.Error(response.message()))
+            }
+        } catch (e: Exception) {
+            if (cachedMovie != null) {
+                emit(Resource.Success(cachedMovie.toUiModel()))
+            } else {
+                emit(Resource.Error(e.message ?: "Unknown error"))
+            }
+        }
+    }
+
     // Mappers
     private fun MovieDto.toEntity(category: String): MovieEntity {
         return MovieEntity(
@@ -128,6 +164,24 @@ class MovieRepository @Inject constructor(
         )
     }
 
+    private fun MovieDetailsDto.toEntity(category: String, isBookmarked: Boolean): MovieEntity {
+        return MovieEntity(
+            id = id,
+            title = title,
+            overview = overview,
+            posterPath = posterPath ?: "",
+            backdropPath = backdropPath ?: "",
+            releaseDate = releaseDate ?: "",
+            voteAverage = voteAverage,
+            category = category,
+            isBookmarked = isBookmarked,
+            runtime = runtime,
+            tagline = tagline,
+            budget = budget,
+            genres = genres?.joinToString { it.name }
+        )
+    }
+
     private fun MovieEntity.toUiModel(): Movie {
         return Movie(
             id = id,
@@ -135,8 +189,11 @@ class MovieRepository @Inject constructor(
             posterPath = posterPath,
             backdropPath = backdropPath,
             rating = voteAverage,
+            duration = runtime?.let { "$it min" } ?: "",
             releaseYear = releaseDate.take(4),
             synopsis = overview,
+            genres = genres?.split(", ") ?: emptyList(),
+            tagline = tagline ?: "",
             isBookmarked = isBookmarked
         )
     }
