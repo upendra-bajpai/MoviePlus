@@ -1,74 +1,51 @@
 package com.upendra.movieplus.ui.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upendra.movieplus.ui.model.HomeUiState
-import com.upendra.movieplus.ui.model.Movie
 import com.upendra.movieplus.ui.model.MovieUiState
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import com.upendra.movieplus.data.repository.MovieRepository
+import kotlinx.coroutines.flow.combine
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: MovieRepository
 ) : ViewModel() {
-
-    private val _uiState = MutableStateFlow(HomeUiState())
-    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<HomeUiState> = combine(
+        repository.getTrending(),
+        repository.getNowPlaying(),
+        repository.getPopular()
+    ){ trending, nowPlaying, popular ->
+        HomeUiState(
+            trendingMovies = if (trending.isEmpty()) MovieUiState.Loading else MovieUiState.Success(trending),
+            nowPlayingMovies = if(nowPlaying.isEmpty()) MovieUiState.Loading else MovieUiState.Success(nowPlaying),
+            popularMovies = if(popular.isEmpty()) MovieUiState.Loading else MovieUiState.Success(popular)
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = HomeUiState()
+    )
 
     init {
         loadHomeData()
     }
 
     private fun loadHomeData() {
-        _uiState.update { it.copy(
-            trendingMovies = MovieUiState.Loading,
-            nowPlayingMovies = MovieUiState.Loading,
-            popularMovies = MovieUiState.Loading
-        )}
-
         viewModelScope.launch {
             try {
-                repository.refreshTrending()
-                repository.refreshNowPlaying()
-                repository.refreshPopular()
+                launch { repository.refreshTrending() }
+                launch { repository.refreshNowPlaying() }
+                launch { repository.refreshPopular() }
             } catch (e: Exception) {
-                // If DB is empty, show error. If not, the collected flows will show old data.
-            }
-        }
-
-        // Collect Trending
-        viewModelScope.launch {
-            repository.getTrending().collect { movies ->
-                if (movies.isNotEmpty()) {
-                    _uiState.update { it.copy(trendingMovies = MovieUiState.Success(movies)) }
-                }
-            }
-        }
-
-        // Collect Now Playing
-        viewModelScope.launch {
-            repository.getNowPlaying().collect { movies ->
-                if (movies.isNotEmpty()) {
-                    _uiState.update { it.copy(nowPlayingMovies = MovieUiState.Success(movies)) }
-                }
-            }
-        }
-
-        // Collect Trending
-        viewModelScope.launch {
-            repository.getPopular().collect { movies ->
-                if (movies.isNotEmpty()) {
-                    _uiState.update { it.copy(popularMovies = MovieUiState.Success(movies)) }
-                }
+                Log.d("HomeViewModel", "Error loading home data: ${e.message}")
             }
         }
     }
