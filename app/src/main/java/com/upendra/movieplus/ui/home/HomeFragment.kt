@@ -17,8 +17,10 @@ import com.upendra.movieplus.ui.adapter.MovieAdapter
 import com.upendra.movieplus.ui.adapter.TrendingAdapter
 import com.upendra.movieplus.ui.model.Movie
 import com.upendra.movieplus.ui.model.MovieUiState
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
@@ -83,7 +85,6 @@ class HomeFragment : Fragment() {
             is MovieUiState.Error -> {
                 binding.shimmerView.stopShimmer()
                 binding.shimmerView.visibility = View.GONE
-                // Show Error
             }
         }
     }

@@ -14,8 +14,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.upendra.movieplus.R
 import com.upendra.movieplus.databinding.FragmentBookmarksBinding
 import com.upendra.movieplus.ui.adapter.MovieAdapter
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class BookmarksFragment : Fragment() {
 
     private var _binding: FragmentBookmarksBinding? = null

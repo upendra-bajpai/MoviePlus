@@ -19,8 +19,10 @@ import com.upendra.movieplus.databinding.FragmentSearchBinding
 import com.upendra.movieplus.ui.adapter.MovieAdapter
 import com.upendra.movieplus.ui.model.MovieUiState
 import com.upendra.movieplus.utils.toStringTrimmed
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null

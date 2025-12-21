@@ -15,8 +15,10 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.upendra.movieplus.databinding.FragmentMovieDetailsBinding
 import com.upendra.movieplus.ui.model.Movie
 import com.upendra.movieplus.ui.model.MovieUiState
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MovieDetailsFragment : Fragment() {
 
     private var _binding: FragmentMovieDetailsBinding? = null
