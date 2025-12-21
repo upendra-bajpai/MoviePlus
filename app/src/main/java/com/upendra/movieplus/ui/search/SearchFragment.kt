@@ -50,6 +50,7 @@ class SearchFragment : Fragment() {
 
     private fun setupRecyclerView() {
         adapter = MovieAdapter { movie ->
+            binding.searchView.hide()
             val bundle = Bundle().apply { putInt("movieId", movie.id) }
             findNavController().navigate(R.id.action_searchFragment_to_movieDetailsFragment, bundle)
         }
@@ -59,11 +60,13 @@ class SearchFragment : Fragment() {
 
     private fun setupSearch() {
         binding.searchView.setupWithSearchBar(binding.searchBar)
+        binding.searchView.editText.doAfterTextChanged { text ->
+            val query = text?.toString()?.trim() ?: ""
+            viewModel.searchMovies(query)
+        }
         binding.searchView.editText.setOnEditorActionListener { v, actionId, event ->
             val query = binding.searchView.text.toStringTrimmed()
             binding.searchBar.setText(query)
-            binding.searchView.hide()
-            viewModel.searchMovies(query)
             false
         }
     }
@@ -74,16 +77,24 @@ class SearchFragment : Fragment() {
                 viewModel.searchState.collect { state ->
                     when (state) {
                         is MovieUiState.Loading -> {
+                            binding.progressBar.visibility = View.VISIBLE
                             binding.layoutEmptyState.visibility = View.GONE
-                            // binding.progressBar.visibility = View.VISIBLE
                         }
 
                         is MovieUiState.Success -> {
+                            binding.progressBar.visibility = View.GONE
                             adapter.submitList(state.data)
 
                             if (state.data.isEmpty()) {
-                                binding.layoutEmptyState.visibility = View.VISIBLE
-                                binding.rvSearchResults.visibility = View.GONE
+                                if (binding.searchView.text.isNullOrBlank()) {
+                                    binding.layoutEmptyState.visibility = View.VISIBLE
+                                    binding.rvSearchResults.visibility = View.GONE
+                                } else {
+                                    // Show "No results" if user has typed something but no results found
+                                    // Maybe update empty state text? For now just show empty state
+                                    binding.layoutEmptyState.visibility = View.VISIBLE
+                                    binding.rvSearchResults.visibility = View.GONE
+                                }
                             } else {
                                 binding.layoutEmptyState.visibility = View.GONE
                                 binding.rvSearchResults.visibility = View.VISIBLE
@@ -91,6 +102,7 @@ class SearchFragment : Fragment() {
                         }
 
                         is MovieUiState.Error -> {
+                            binding.progressBar.visibility = View.GONE
                             binding.layoutEmptyState.visibility = View.VISIBLE
                             binding.rvSearchResults.visibility = View.GONE
                         }

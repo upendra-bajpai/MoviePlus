@@ -9,7 +9,7 @@ import com.upendra.movieplus.data.local.entity.MovieEntity
 
 @Database(
     entities = [MovieEntity::class],
-    version = 2,
+    version =2,
     autoMigrations = [
         AutoMigration(from = 1, to = 2)
     ],
