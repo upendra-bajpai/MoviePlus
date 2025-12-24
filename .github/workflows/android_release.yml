@@ -46,7 +46,8 @@ jobs:
             -Pandroid.injected.signing.store.file=$(pwd)/release.jks \
             -Pandroid.injected.signing.store.password="${{ secrets.KEY_STORE_PASSWORD }}" \
             -Pandroid.injected.signing.key.alias="${{ secrets.ALIAS }}" \
-            -Pandroid.injected.signing.key.password="${{ secrets.KEY_PASSWORD }}"
+            -Pandroid.injected.signing.key.password="${{ secrets.KEY_PASSWORD }}" \
+            --stacktrace
         else
           ./gradlew assembleRelease
         fi
