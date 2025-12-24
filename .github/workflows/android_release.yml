@@ -37,14 +37,13 @@ jobs:
           echo "ERROR: SIGNING_KEY secret is empty. Please add it to GitHub Secrets."
           exit 1
         fi
-        # Create it in the app directory where Gradle expects it
-        echo -n "${{ secrets.SIGNING_KEY }}" | base64 --decode > app/release.jks
+        echo -n "${{ secrets.SIGNING_KEY }}" | base64 --decode > release.jks
 
     - name: Build with Gradle
       run: |
         if [ "${{ startsWith(github.ref, 'refs/tags/') }}" == "true" ]; then
           ./gradlew assembleRelease \
-            -Pandroid.injected.signing.store.file=release.jks \
+            -Pandroid.injected.signing.store.file=$(pwd)/release.jks \
             -Pandroid.injected.signing.store.password="${{ secrets.KEY_STORE_PASSWORD }}" \
             -Pandroid.injected.signing.key.alias="${{ secrets.ALIAS }}" \
             -Pandroid.injected.signing.key.password="${{ secrets.KEY_PASSWORD }}"
