@@ -17,13 +17,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:hint="Search movies..." />
+            android:hint="@string/hint_search_movies" />
     </com.google.android.material.appbar.AppBarLayout>
     <com.google.android.material.search.SearchView
         android:id="@+id/search_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:hint="Search movies..."
+        android:hint="@string/hint_search_movies"
         app:layout_anchor="@id/search_bar">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -68,7 +68,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Search for your favorite movie"
+                    android:text="@string/text_search_empty"
                     android:textColor="@color/white"
                     android:textSize="16sp" />
             </LinearLayout>

@@ -27,15 +27,5 @@
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:text="Oppenheimer" />
-
-    <com.google.android.material.button.MaterialButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        android:text="Watch Now"
-        app:cornerRadius="8dp"
-        app:layout_constraintBottom_toTopOf="@id/tv_title"
-        app:layout_constraintStart_toStartOf="parent" />
-
+        tools:text="" />
 </androidx.constraintlayout.widget.ConstraintLayout>

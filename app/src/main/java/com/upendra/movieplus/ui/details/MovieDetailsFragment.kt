@@ -116,16 +116,19 @@ class MovieDetailsFragment : Fragment() {
     }
 
     private fun shareMovie(movie: Movie) {
-        val shareText = "Check out this movie: ${movie.title}\n\n" +
-                "Rating: ⭐ ${String.format("%.1f", movie.rating)}\n\n" +
-                "Watch it here: https://www.movieplus.com/movie/${movie.id}"
+        val shareText = getString(
+            R.string.share_template,
+            movie.title,
+            String.format("%.1f", movie.rating),
+            movie.id
+        )
                 
         val shareIntent = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, shareText)
             type = "text/plain"
         }
-        startActivity(Intent.createChooser(shareIntent, "Share movie via"))
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.label_share_movie_via)))
     }
 
     override fun onDestroyView() {
