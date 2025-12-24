@@ -1,5 +1,6 @@
 package com.upendra.movieplus.ui.details
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -97,16 +98,34 @@ class MovieDetailsFragment : Fragment() {
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.ivBackdrop)
 
-        val bookmarkIcon = if (movie.isBookmarked) 
-            android.R.drawable.btn_star_big_on 
-        else 
-            android.R.drawable.btn_star_big_off
-            
-        binding.btnBookmark.setImageResource(bookmarkIcon)
+        if (movie.isBookmarked) {
+            binding.btnBookmark.setImageResource(android.R.drawable.btn_star_big_on)
+            binding.btnBookmark.setColorFilter(resources.getColor(R.color.accent, null))
+        } else {
+            binding.btnBookmark.setImageResource(android.R.drawable.btn_star_big_off)
+            binding.btnBookmark.setColorFilter(resources.getColor(R.color.white, null))
+        }
             
         binding.btnBookmark.setOnClickListener {
             viewModel.toggleBookmark(movie)
         }
+
+        binding.btnShare.setOnClickListener {
+            shareMovie(movie)
+        }
+    }
+
+    private fun shareMovie(movie: Movie) {
+        val shareText = "Check out this movie: ${movie.title}\n\n" +
+                "Rating: ⭐ ${String.format("%.1f", movie.rating)}\n\n" +
+                "Watch it here: https://www.movieplus.com/movie/${movie.id}"
+                
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, shareText)
+            type = "text/plain"
+        }
+        startActivity(Intent.createChooser(shareIntent, "Share movie via"))
     }
 
     override fun onDestroyView() {

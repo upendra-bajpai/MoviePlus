@@ -23,4 +23,11 @@ class MainActivity : AppCompatActivity() {
         
         binding.bottomNav.setupWithNavController(navController)
     }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navHostFragment.navController.handleDeepLink(intent)
+    }
 }

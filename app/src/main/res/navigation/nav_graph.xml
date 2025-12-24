@@ -43,5 +43,9 @@
         <argument
             android:name="movieId"
             app:argType="integer" />
+        <deepLink
+            app:uri="movieplus://movie/{movieId}" />
+        <deepLink
+            app:uri="https://www.movieplus.com/movie/{movieId}" />
     </fragment>
 </navigation>
