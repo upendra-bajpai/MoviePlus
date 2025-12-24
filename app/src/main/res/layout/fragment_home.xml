@@ -38,23 +38,14 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
-            android:text="Now Playing"
+            android:text="@string/title_now_playing"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/trending_pager" />
 
-        <TextView
-            android:id="@+id/btn_see_all_now_playing"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:text="See All"
-            android:textColor="@color/accent"
-            app:layout_constraintBottom_toBottomOf="@id/tv_now_playing_title"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_now_playing_title" />
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_now_playing"
@@ -75,23 +66,14 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
-            android:text="Popular"
+            android:text="@string/title_popular"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/rv_now_playing" />
 
-        <TextView
-            android:id="@+id/btn_see_all_popular"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:text="See All"
-            android:textColor="@color/accent"
-            app:layout_constraintBottom_toBottomOf="@id/tv_popular_title"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_popular_title" />
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_popular"

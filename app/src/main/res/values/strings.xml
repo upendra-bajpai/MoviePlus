@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">MoviePlus</string>
+    
+    <!-- Navigation Labels -->
+    <string name="label_home">Home</string>
+    <string name="label_search">Search</string>
+    <string name="label_bookmarks">Bookmarks</string>
+    <string name="label_movie_details">Movie Details</string>
+    
+    <!-- Home Fragment -->
+    <string name="title_now_playing">Now Playing</string>
+    <string name="title_popular">Popular</string>
+    
+    <!-- Search Fragment -->
+    <string name="hint_search_movies">Search movies...</string>
+    <string name="text_search_empty">Search for your favorite movie</string>
+    
+    <!-- Bookmarks Fragment -->
+    <string name="title_bookmarks">Bookmarks</string>
+    
+    <!-- Movie Details Fragment -->
+    <string name="title_synopsis">Synopsis</string>
+    <string name="label_share_movie_via">Share movie via</string>
+    <string name="share_template">Check out this movie: %1$s\n\nRating: ⭐ %2$s\n\nWatch it here: https://www.movieplus.com/movie/%3$d</string>
+    <string name="error_invalid_movie_id">Invalid Movie ID</string>
 </resources>

@@ -26,7 +26,7 @@
         android:background="@color/surface"
         app:backgroundTint="@color/surface"
         app:itemIconTint="@color/accent"
-        app:itemTextColor="@color/accent"
+        app:itemTextColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

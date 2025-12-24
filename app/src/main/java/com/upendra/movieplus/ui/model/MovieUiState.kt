@@ -22,5 +22,6 @@ data class Movie(
     val releaseYear: String = "",
     val synopsis: String = "",
     val genres: List<String> = emptyList(),
+    val tagline: String = "",
     var isBookmarked: Boolean = false
 )

@@ -17,8 +17,10 @@ import com.upendra.movieplus.ui.adapter.MovieAdapter
 import com.upendra.movieplus.ui.adapter.TrendingAdapter
 import com.upendra.movieplus.ui.model.Movie
 import com.upendra.movieplus.ui.model.MovieUiState
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
@@ -48,8 +50,33 @@ class HomeFragment : Fragment() {
         nowPlayingAdapter = MovieAdapter { navigateToDetails(it) }
         popularAdapter = MovieAdapter { navigateToDetails(it) }
 
-        binding.rvNowPlaying.adapter = nowPlayingAdapter
-        binding.rvPopular.adapter = popularAdapter
+        binding.rvNowPlaying.apply {
+            adapter = nowPlayingAdapter
+            addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+                    val layoutManager = layoutManager as LinearLayoutManager
+                    val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+                    val totalItemCount = layoutManager.itemCount
+                    if (lastVisibleItem >= totalItemCount - 5) {
+                        viewModel.loadMoreNowPlaying()
+                    }
+                }
+            })
+        }
+
+        binding.rvPopular.apply {
+            adapter = popularAdapter
+            addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+                    val layoutManager = layoutManager as LinearLayoutManager
+                    val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+                    val totalItemCount = layoutManager.itemCount
+                    if (lastVisibleItem >= totalItemCount - 5) {
+                        viewModel.loadMorePopular()
+                    }
+                }
+            })
+        }
     }
 
     private fun navigateToDetails(movie: Movie) {
@@ -83,7 +110,6 @@ class HomeFragment : Fragment() {
             is MovieUiState.Error -> {
                 binding.shimmerView.stopShimmer()
                 binding.shimmerView.visibility = View.GONE
-                // Show Error
             }
         }
     }

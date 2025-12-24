@@ -1,21 +1,43 @@
 package com.upendra.movieplus.ui.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upendra.movieplus.ui.model.HomeUiState
-import com.upendra.movieplus.ui.model.Movie
 import com.upendra.movieplus.ui.model.MovieUiState
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import com.upendra.movieplus.data.repository.MovieRepository
+import kotlinx.coroutines.flow.combine
 
-class HomeViewModel : ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val repository: MovieRepository
+) : ViewModel() {
+    private var nowPlayingPage = 1
+    private var popularPage = 1
+    private var isNowPlayingLoading = false
+    private var isPopularLoading = false
 
-    private val _uiState = MutableStateFlow(HomeUiState())
-    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<HomeUiState> = combine(
+        repository.getTrending(),
+        repository.getNowPlaying(),
+        repository.getPopular()
+    ){ trending, nowPlaying, popular ->
+        HomeUiState(
+            trendingMovies = if (trending.isEmpty()) MovieUiState.Loading else MovieUiState.Success(trending),
+            nowPlayingMovies = if(nowPlaying.isEmpty()) MovieUiState.Loading else MovieUiState.Success(nowPlaying),
+            popularMovies = if(popular.isEmpty()) MovieUiState.Loading else MovieUiState.Success(popular)
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = HomeUiState()
+    )
 
     init {
         loadHomeData()
@@ -23,25 +45,33 @@ class HomeViewModel : ViewModel() {
 
     private fun loadHomeData() {
         viewModelScope.launch {
-            _uiState.update { it.copy(trendingMovies = MovieUiState.Loading) }
-            
-            // Simulating API Call
-            delay(2000)
-            
-            val mockMovies = listOf(
-                Movie(1, "The Dark Knight", "/poster1.jpg", "/backdrop1.jpg", 9.0),
-                Movie(2, "Inception", "/poster2.jpg", "/backdrop2.jpg", 8.8),
-                Movie(3, "Interstellar", "/poster3.jpg", "/backdrop3.jpg", 8.6),
-                Movie(4, "Oppenheimer", "/poster4.jpg", "/backdrop4.jpg", 8.5)
-            )
-
-            _uiState.update { 
-                it.copy(
-                    trendingMovies = MovieUiState.Success(mockMovies),
-                    nowPlayingMovies = MovieUiState.Success(mockMovies.shuffled()),
-                    popularMovies = MovieUiState.Success(mockMovies.reversed())
-                )
+            try {
+                launch { repository.refreshTrending() }
+                launch { repository.refreshNowPlaying(nowPlayingPage) }
+                launch { repository.refreshPopular(popularPage) }
+            } catch (e: Exception) {
+                Log.d("HomeViewModel", "Error loading home data: ${e.message}")
             }
+        }
+    }
+
+    fun loadMoreNowPlaying() {
+        if (isNowPlayingLoading) return
+        isNowPlayingLoading = true
+        viewModelScope.launch {
+            nowPlayingPage++
+            repository.refreshNowPlaying(nowPlayingPage)
+            isNowPlayingLoading = false
+        }
+    }
+
+    fun loadMorePopular() {
+        if (isPopularLoading) return
+        isPopularLoading = true
+        viewModelScope.launch {
+            popularPage++
+            repository.refreshPopular(popularPage)
+            isPopularLoading = false
         }
     }
 }

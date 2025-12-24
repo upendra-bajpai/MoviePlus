@@ -7,8 +7,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import com.upendra.movieplus.data.repository.MovieRepository
 
-class BookmarksViewModel : ViewModel() {
+@HiltViewModel
+class BookmarksViewModel @Inject constructor(
+    private val repository: MovieRepository
+) : ViewModel() {
 
     private val _bookmarks = MutableStateFlow<List<Movie>>(emptyList())
     val bookmarks: StateFlow<List<Movie>> = _bookmarks.asStateFlow()
@@ -19,15 +25,15 @@ class BookmarksViewModel : ViewModel() {
 
     private fun loadBookmarks() {
         viewModelScope.launch {
-            // Simulating Room reactive flow
-            _bookmarks.value = listOf(
-                Movie(1, "The Dark Knight", "/poster1.jpg", "/backdrop1.jpg", 9.0),
-                Movie(2, "Inception", "/poster2.jpg", "/backdrop2.jpg", 8.8)
-            )
+            repository.getBookmarks().collect {
+                _bookmarks.value = it
+            }
         }
     }
 
     fun removeBookmark(movie: Movie) {
-        _bookmarks.value = _bookmarks.value.filter { it.id != movie.id }
+        viewModelScope.launch {
+            repository.toggleBookmark(movie.id, false)
+        }
     }
 }
