@@ -40,7 +40,6 @@ jobs:
           exit 1
         fi
         echo "$SIGNING_KEY" | base64 --decode > release.jks
-        echo "Keystore decoded. Size: $(wc -c < release.jks) bytes"
 
     - name: Build with Gradle
       run: |
@@ -49,8 +48,7 @@ jobs:
             -Pandroid.injected.signing.store.file=$(pwd)/release.jks \
             -Pandroid.injected.signing.store.password="${{ secrets.KEY_STORE_PASSWORD }}" \
             -Pandroid.injected.signing.key.alias="${{ secrets.ALIAS }}" \
-            -Pandroid.injected.signing.key.password="${{ secrets.KEY_PASSWORD }}" \
-            --stacktrace
+            -Pandroid.injected.signing.key.password="${{ secrets.KEY_PASSWORD }}"
         else
           ./gradlew assembleRelease
         fi
