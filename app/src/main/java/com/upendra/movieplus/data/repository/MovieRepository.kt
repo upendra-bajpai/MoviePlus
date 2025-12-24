@@ -31,9 +31,9 @@ class MovieRepository @Inject constructor(
             }
     }
 
-    suspend fun refreshNowPlaying() {
+    suspend fun refreshNowPlaying(page: Int = 1) {
         try {
-            val response = apiService.getNowPlaying()
+            val response = apiService.getNowPlaying(page)
             if (response.isSuccessful) {
                 response.body()?.results?.let { dtos ->
                     val entities = dtos.map { it.toEntity("now_playing") }
@@ -53,7 +53,6 @@ class MovieRepository @Inject constructor(
     suspend fun refreshTrending() {
         try {
             val response = apiService.getTrendingMovies()
-            print("trending ${response.body()?.totalResults}")
             if (response.isSuccessful) {
                 response.body()?.results?.let { dtos ->
                     val entities = dtos.map { it.toEntity("trending") }
@@ -67,9 +66,9 @@ class MovieRepository @Inject constructor(
         return movieDao.getMoviesByCategory("popular").map { entities -> entities.map { it.toUiModel()  }}
     }
 
-    suspend fun refreshPopular() {
+    suspend fun refreshPopular(page: Int = 1) {
        try {
-            val response = apiService.getPopularMovies()
+            val response = apiService.getPopularMovies(page)
             if (response.isSuccessful) {
                 response.body()?.results?.let { dtos ->
                     val entities = dtos.map {

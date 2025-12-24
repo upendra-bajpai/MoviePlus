@@ -18,6 +18,11 @@ import kotlinx.coroutines.flow.combine
 class HomeViewModel @Inject constructor(
     private val repository: MovieRepository
 ) : ViewModel() {
+    private var nowPlayingPage = 1
+    private var popularPage = 1
+    private var isNowPlayingLoading = false
+    private var isPopularLoading = false
+
     val uiState: StateFlow<HomeUiState> = combine(
         repository.getTrending(),
         repository.getNowPlaying(),
@@ -42,11 +47,31 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 launch { repository.refreshTrending() }
-                launch { repository.refreshNowPlaying() }
-                launch { repository.refreshPopular() }
+                launch { repository.refreshNowPlaying(nowPlayingPage) }
+                launch { repository.refreshPopular(popularPage) }
             } catch (e: Exception) {
                 Log.d("HomeViewModel", "Error loading home data: ${e.message}")
             }
+        }
+    }
+
+    fun loadMoreNowPlaying() {
+        if (isNowPlayingLoading) return
+        isNowPlayingLoading = true
+        viewModelScope.launch {
+            nowPlayingPage++
+            repository.refreshNowPlaying(nowPlayingPage)
+            isNowPlayingLoading = false
+        }
+    }
+
+    fun loadMorePopular() {
+        if (isPopularLoading) return
+        isPopularLoading = true
+        viewModelScope.launch {
+            popularPage++
+            repository.refreshPopular(popularPage)
+            isPopularLoading = false
         }
     }
 }

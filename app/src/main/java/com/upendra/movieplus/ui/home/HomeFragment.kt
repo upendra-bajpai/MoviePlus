@@ -50,8 +50,33 @@ class HomeFragment : Fragment() {
         nowPlayingAdapter = MovieAdapter { navigateToDetails(it) }
         popularAdapter = MovieAdapter { navigateToDetails(it) }
 
-        binding.rvNowPlaying.adapter = nowPlayingAdapter
-        binding.rvPopular.adapter = popularAdapter
+        binding.rvNowPlaying.apply {
+            adapter = nowPlayingAdapter
+            addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+                    val layoutManager = layoutManager as LinearLayoutManager
+                    val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+                    val totalItemCount = layoutManager.itemCount
+                    if (lastVisibleItem >= totalItemCount - 5) {
+                        viewModel.loadMoreNowPlaying()
+                    }
+                }
+            })
+        }
+
+        binding.rvPopular.apply {
+            adapter = popularAdapter
+            addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+                    val layoutManager = layoutManager as LinearLayoutManager
+                    val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+                    val totalItemCount = layoutManager.itemCount
+                    if (lastVisibleItem >= totalItemCount - 5) {
+                        viewModel.loadMorePopular()
+                    }
+                }
+            })
+        }
     }
 
     private fun navigateToDetails(movie: Movie) {
