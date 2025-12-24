@@ -37,7 +37,8 @@ jobs:
           echo "ERROR: SIGNING_KEY secret is empty. Please add it to GitHub Secrets."
           exit 1
         fi
-        echo -n "${{ secrets.SIGNING_KEY }}" | base64 --decode > release.jks
+        # Create it in the app directory where Gradle expects it
+        echo -n "${{ secrets.SIGNING_KEY }}" | base64 --decode > app/release.jks
 
     - name: Build with Gradle
       run: |
