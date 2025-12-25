@@ -17,7 +17,4 @@ data class MovieDto(
     @SerializedName("backdrop_path") val backdropPath: String?,
     @SerializedName("release_date") val releaseDate: String?,
     @SerializedName("vote_average") val voteAverage: Double
-) {
-    fun getFullPosterPath() = posterPath?.let { "https://image.tmdb.org/t/p/w500$it" } ?: ""
-    fun getFullBackdropPath() = backdropPath?.let { "https://image.tmdb.org/t/p/original$it" } ?: ""
-}
+)

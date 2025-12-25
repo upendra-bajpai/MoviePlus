@@ -1,5 +1,6 @@
 package com.upendra.movieplus.di
 
+import com.upendra.movieplus.BuildConfig
 import com.upendra.movieplus.data.remote.MovieApiService
 import dagger.Module
 import dagger.Provides
@@ -32,7 +33,7 @@ object NetworkModule {
             val originalHttpUrl = original.url
 
             val url = originalHttpUrl.newBuilder()
-                .addQueryParameter("api_key", "313f022352c2f01d744a36890e1000fc") // Replace with actual key
+                .addQueryParameter("api_key", BuildConfig.TMDB_API_KEY)
                 .build()
 
             val requestBuilder = original.newBuilder().url(url)

@@ -1,7 +1,6 @@
 package com.upendra.movieplus.data.remote
 
 import com.upendra.movieplus.data.remote.dto.MovieDetailsDto
-import com.upendra.movieplus.data.remote.dto.MovieDto
 import com.upendra.movieplus.data.remote.dto.MovieResponse
 import retrofit2.Response
 import retrofit2.http.GET

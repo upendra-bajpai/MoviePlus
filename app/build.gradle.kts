@@ -1,11 +1,24 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     id("kotlin-kapt")
+    alias(libs.plugins.androidx.room)
 }
 
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        load(FileInputStream(localPropertiesFile))
+    }
+}
+room {
+    schemaDirectory("$projectDir/schemas")
+}
 android {
     namespace = "com.upendra.movieplus"
     compileSdk = 36
@@ -21,6 +34,10 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // Add the API Key to BuildConfig
+        val apiKey = localProperties.getProperty("TMDB_API_KEY") ?: ""
+        buildConfigField("String", "TMDB_API_KEY", "\"$apiKey\"")
     }
 
     buildTypes {
@@ -42,25 +59,11 @@ android {
     buildFeatures {
         viewBinding = true
         compose = true
+        buildConfig = true // Enable BuildConfig generation
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-
-    kapt {
-        arguments {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
-    }
-
-    splits {
-        abi {
-            isEnable = true
-            reset()
-            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
-            isUniversalApk = true
         }
     }
 }
@@ -99,7 +102,7 @@ dependencies {
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
-    implementation(libs.okhttp.logging)
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     // Hilt
     implementation(libs.hilt.android)
