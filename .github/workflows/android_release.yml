@@ -48,9 +48,10 @@ jobs:
             -Pandroid.injected.signing.store.file=$(pwd)/release.jks \
             -Pandroid.injected.signing.store.password="${{ secrets.KEY_STORE_PASSWORD }}" \
             -Pandroid.injected.signing.key.alias="${{ secrets.ALIAS }}" \
-            -Pandroid.injected.signing.key.password="${{ secrets.KEY_PASSWORD }}"
+            -Pandroid.injected.signing.key.password="${{ secrets.KEY_PASSWORD }}" \
+            -PTMDB_API_KEY="${{ secrets.TMDB_API_KEY }}"
         else
-          ./gradlew assembleRelease
+          ./gradlew assembleRelease -PTMDB_API_KEY="${{ secrets.TMDB_API_KEY }}"
         fi
 
     - name: Collect APKs

@@ -35,8 +35,10 @@ android {
             useSupportLibrary = true
         }
 
-        // Add the API Key to BuildConfig
-        val apiKey = localProperties.getProperty("TMDB_API_KEY") ?: ""
+        // Add the API Key to BuildConfig: Check project property (CI) first, then local.properties
+        val apiKey = project.findProperty("TMDB_API_KEY")?.toString()
+            ?: localProperties.getProperty("TMDB_API_KEY")
+            ?: ""
         buildConfigField("String", "TMDB_API_KEY", "\"$apiKey\"")
     }
 
